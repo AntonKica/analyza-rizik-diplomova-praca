@@ -1,7 +1,272 @@
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
-\markboth{Introduction}{Introduction}
+\chapter*{Úvod}
+\addcontentsline{toc}{chapter}{Úvod}
+\markboth{Úvod}{Úvod}
 
-Put your introduction here. By the way, you can cite articles~\cite{moore_hard_tiling}, books~\cite{golomb_polyomino_book}, websites~\cite{cadical_github}, manuals~\cite{sage}, or other resources. You can reference other chapters, sections, images, etc.\ using the \texttt{cleveref} package like this:~\cref{ch:terminology}.
+\section{Motivácia}
 
-\LaTeX{} basics tutorial: \url{https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes}
+V poslednej dobe sa do popredia svetových a regionálnych udalostí dostali mnohé kybernetické útoky. Prakticky hneď začiatkom roka 2025 sa
+Slovensko stalo cieľom tzv. kybernetického útoku, kedy hackerská skupina zaútočila na informačné systémy Úradu geodézie, kartografie a katastra SR
+(ÚGKK)\cite{utok_na_kataster_aktuality}\footnote{Konkrétny deň útoku nebol jasne určený, oznam na portáli ÚGKK bol zverejnený 7. januára, no sú náznaky,
+že útok prebehol už v nedeľu 5. januára, kedy už bol systém nedostupný.}. Tento útok vyradil štátnu elektronickú službu katastra, pričom hackeri zašifrovali
+ostré (produkčné) dáta a údajne si pýtali výkupné v hodnote niekoľkých miliónov dolárov\cite{utok_na_kataster_vykupne}.
+
+\todo{Info z 2023 o audite katastra..?}
+
+Pár dni po útoku zverejnil jeden užívateľ na socialnej sieti LinkedIn príspevok\cite{linkedin_post_mortem_analyza_perimetra_katastra}, v ktorom vykonal
+\enquote{\textit{post portem} analýzu perimetra Katastra z verejných zdrojov} pomocou nástroja Shodan. V tejto analýze autor identifikoval mnohé zraniteľnosti
+informačného systému --- zastarané verzie protokolu TLS (verzie 1.1 a 1.2), zastarané verzie PHP a Apache Server (z rokov 2009 a 2010), otvorené porty
+(123 --- NTP a 161 --- SNMP)\footnote{Pomocou útoku na otvorený port protokolu NTP možno zneužiť na amplifikovanie útoku DDoS.} alebo 230 softvérový
+zraniteľností\footnote{10 z nich bolo CVE a mnohé z nich umožňovali vykonávanie ľubovoľného kódu.}. V jednoduchosti, mimo iných problémov,
+bolo zanedbané patchovanie služieb a systémov, čo vytváralo potenciálny uhol útoku pre útočníka\footnote{Spomenieme ešte, že autor tiež konštatuje,
+prečo tieto zraniteľnosti neodhalil systém Achilles vládneho CSIRT a prečo neboli nahlásené jeho zistenia.}.
+
+Obnova funkcionality katastra nebola kompletná ani ešte začiatkom februára\cite{otvaranie_katastralnych_udajov_zive}, pričom nebolo jasné, či má štát dostupné
+kompletné zálohy dát na obnovu systému. Čo však vcelku zrejmé bolo, že štát nemal dostupné komplexné zálohy na rýchlu obnovu systému. Nedostupnosť tohto systému vedie
+k mnohým komplikáciam života občanov alebo k ekonomickým strátam.
+
+Kybernetické útoky nie sú v súčastnosti ničím výnimočným a dochádza k nim prakticky každý deň (pričom drvivá väčšina z nich je neúspešná). Nedávno došlo k
+útoku aj na ďalšie inštitúcie Slovenska (Všeobecnú zdravotnú poisťovňu\cite{utok_na_vszp_zive} alebo Trenčianské vodárne a kanalizácie\cite{utok_na_trencin_zive}).
+Samozrejme, Slovensko nie je žiadnou výnimkou, podobne boli zasiahnutý aj naši severní susedia Poliaci, kde došlo k útoku na spoločnosť
+EuroCert\cite{utok_na_polsko_zive}\cite{utok_na_polsko_eurocert}\footnote{Unikli citlivé údaje, ako napríklad údaje z občianskych preukazov, čísla PESEL
+(poľská verzia rodných čísel), kontaktné údaje, prihlasovacie mená a heslá.}.
+
+Z pohľadu čísel jeden zdroj uvádza \cite{pocet_kyberutokov_na_slovensku}, že v druhej polovici roka 2024 každá organizácia na Slovensku čelila v priemere
+1443 kybernetickým útokom každý týždeň, pričom toto číslo stúplo až na 2000 v priebehu decembra\footnote{Najväčší podiel tvorili DoS útoky botnetov s
+podielom 11.5\%.}. 
+
+Keby pôjdeme o kúsok ďalej a pozrieme sa na Európu, ENISA vydala v septembri 2024 ročnú správu o stave hrozieb v prostredí kybernetickej
+bezpečnosti\cite{enisa_cybersecurity_threat_landscape_2024}. V tejto správe pozorovali 11,709 incidentov a identifikovala niekoľko primárnych hrozieb ---
+ransomvér, malvér, sociálne inžinierstvo, hrozba voči dátam, DoS útoky a manipuláciu informácií. Útoky boli najviac zamerané na verejný sektor a tvorili
+podiel až 19\%(1870 incidentov), najpočetnejšiu skupinu hrozieb tvorili útoky DOS/DDOS/RDOS (46.31\%, 2460 incidentov), ransomvér (27.33\%, 1450 incidentov)
+a útok na dáta\footnote{V zmysle úmyselné narušenie údajov alebo neúmyselný únik údajov.} (18.57\%, 840 incidentov).
+
+Týmto krátkym úvodom sme chceli čitateľovi naznačiť a upevniť v tom, že súčasné informačné systémy napojené na internet sú vystavené veľkému počtu hrozieb.
+Chrániť svoje systému musí každá organizácia, či je malá alebo veľká, pretože potenciálne (v niektorých prípadoch aj reálne) negatívne následky často
+rádovo prevyšujú náklady, ktoré by mohli organizácie vynaložiť na preventívne opatrenia a systematické riešenie informačnej a kybernetickej bezpečnosti.
+Nehovoriac o Slovenskej legislatíve, ktorá ukladá veľkému množstvu subjektov mnohé zákonné povinnosti v oblasti informačnej a kybernetickej bezpečnosti.
+Preto položíme čitateľovi otázku v kontexte predchádzajúcich odstavcov: \enquote{Keď už aj veľké inštitúcie ako ÚGKK majú problém so zaistením dostatočnej
+informačnej a kybernetickej bezpečnosti, o čo lepšie na tom budú malé samosprávy s menšími kapacitami a zdrojmi?}
+
+%todo a Markízu\cite{it_expert_markiza},
+\todo{vieme nájsť aj citáciu záberu z markízy?}
+
+Jeden IT expert uviedol pre Rádio Expres\cite{it_expert_radio_express}, že v prepočte na počet obcí nám na Slovensku chýba
+zhruba 20,000 expertov v oblasti kybernetickej a informačnej bezpečnosti. My si tento problém uvedomujeme a preto by sme aj chceli navrhnúť systematické
+riešenie, ktorým by sme ho vyriešili. Čím sa dostávame k našej diplomovej práci: \enquote{Čo keby existoval expertný systém pre malé samosprávy, ktorý by
+vedel laikovi pomôcť vysvetliť kybernetickú a informačnú bezpečnosť, identifikovať aktíva, posúdiť potenciálne hrozby a prijať bezpečnostné opatrenia na
+ošetrenie dopadu rizík?} Návrhu a zdrojom potrebným na vypracovanie takéhoto systému sa budeme venovať v ďalších častiach práce.
+
+\section{Legislatívny rámec}
+
+Problematike kybernetickej a informačnej bezpečnosti sa v legislatívnom rámci Slovenskej republiky venujú najmä dva zákony, a to
+Zákon o kybernetickej bezpečnosti\cite{sk_69_2018}(ZoKB) a Zákon o informačných technológiách vo verejnej správe\cite{sk_95_2019}(ZoITVS).
+Oba zákony vychádzajú z medzinárodných štandardov série ISO/IEC 27000, sú navzájom prepojené a vzájomne na seba odkazujú.
+
+\subsection*{69/2018 Z. z., zákon o kybernetickej bezpečnosti}
+Tento zákon patrí pod pôsobnosť Národného bezpečnostného úradu (NBÚ) a definuje základný subjekt --- prevádzkovateľ základnej služby --- to je ten,
+kto je zapísaný v registry prevádzkovateľov základnej služby. Register základných prevádzkovateľov služieb vedie a spravuje NBÚ a v súčasnosti je
+v ňom zapísaných vyše 1500 subjektov, ako napríklad rôzne obce, mestá, nemocnice a iné.
+
+Analýza rizík sa explicitné spomína v \par20, ods. (1):
+\begin{quote}
+[\ldots] Bezpečnostné opatrenia sú realizované na základe vykonanej analýzy rizík a s prihliadnutím na bezpečnostné metodiky a politiky úradu, najnovšie bezpečnostné
+trendy a medzinárodné normy a v súlade s bezpečnostnými štandardami v oblasti kybernetickej bezpečnosti a prijímajú sa s cieľom [\ldots]
+\end{quote}
+
+Na subjekty kladie ZoKB rôzne požiadavky v oblasti KIB a ukladá im povinnosť zaviesť bezpečnostné opatrenia v závislostí od kategórie sietí a informačných
+systémov\footnote{Kategórie sú tri v závislosti od rozsahu potencionálneho bezpečnostného incidentu.}. Rozsah a podrobnosti bezpečnostných oprávnení
+upravuje samostatná vyhláška 362/2018 Z. z.\cite{sk_362_2018}.
+
+\subsection*{95/2019 Z. z., zákon o informačných technológiách vo verejnej správe}
+Tento zákon patrí pod pôsobnosť Ministerstva investícií, regionálneho rozvoja a informatizácie (MIRRI) a definuje nasledovné pojmy a subjekty:
+\begin{itemize}
+    \item \textbf{informačná technológia}, prostriedok alebo postup slúžiaci na spracúvanie údajov alebo informácií v elktronickej podobe (informačný systém,
+    infraštruktúra, informačná činnosť alebo elektronické služby) 
+    \item \textbf{informačný systém}, funkčný celok zabezpečujúci cieľavedomú informačnú a systematickú činnosť prostredníctvom technických a programových prostriedkov
+    \item \textbf{správca}, orgán riadenia zodpovedný za informačnú technológiu na účely poskytovania služby verejnej správy
+    \item \textbf{prevádzkovateľ}, osobitným predpisom ustanovený orgán riadenia alebo správcom určená osoba a vykonáva činnosti, ktoré mu určí správca\footnote{V skrate,
+    správca môže delegovať svoje činnosti, no stále za ňu nesie zodpovednosť.}
+\end{itemize}
+Rámcovo definuje kompetencie, právomoci a povinnosti správcu pre oblasť KIB, ako napríklad povinnosti pri navrhovaní, akvizícii a obstarávaní informačných systémov alebo
+povinnosti voči tretím stranám. Podobne, ako pri ZoKB, kategorizácia sietí a informačných systémov je podrobne rozpracovaná vo vyhláške 179/2020 Z. z.\cite{sk_179_2020}.
+
+Analýza rizík sa explicitné spomína v \par14, ods. (1), písm. h):
+\begin{quote}
+(1) Správca je na úseku plánovania a organizácie informačných technológií verejnej správy povinný 
+
+\hspace{3em}h) zabezpečiť riadenie rizík,
+\end{quote}
+
+\section{Základné pojmy}
+
+Štandardom v oblasti kybernetickej a informačnej bezpečnosti sa venujú viaceré veľké organizácie, terminológia ešte nie je jednotná, ako to uvádza ENISA
+vo svojom prehľade o medzerách a prienikoch v štandardizácií\cite{enisa_cybersecurity_definition_gaps}. Preto sa v tejto časti budeme venovať terminológii,
+aby sme mali rovnakú predstavu a pochopenie za jednotlivými pojmami, vychádzať budeme z materiálu \enquote{Krátky úvodu do informačnej a kybernetickej
+bezpečnosti}\cite{KUdIKBaMVS}.
+
+\subsection*{informácia}
+Esenciálny zdroj, bez ktorého organizácia nemôže plniť svoje poslanie. Spracováva sa digitálnymi informačnými a komunikačnými technológiami.
+
+\subsection*{informačná bezpečnosť}
+Zaoberá sa hrozbami voči informáciám a hľadaním účinných bezpečnostných opatrení na zníženie rizika, ktoré vplýva z naplnenia týchto hrozieb.
+
+\subsection*{informačné a komunikačné technológie, IKT}
+Metódy, prostriedky a zariadenia slúžiace na záznam, prenos, uchovávanie a spracovanie informácie.
+
+\subsection*{digitálne informačné a komunikačné technológie, d-IKT}
+IKT, ktoré vznikli spojením počítačov, telekomunikačných sieti a masovokomunikačných prostriedkov, ktoré využívajú digitálne kódovanie informácie
+a spoločné komunikačné kanály na prenos údajov.
+
+\subsection*{aktívum}
+Čokoľvek, čo má pre organizáciu hodnotu. Môže byť hmotné --- zariadenie, personál alebo nehmotné --- informácia, vedomosť.
+
+\subsection*{hrozba}
+Objektívne existujúca potenciálna možnosť priamo alebo nepriamo narušiť systém, spracovávanú informáciu alebo iné aktíva organizácie.
+
+\subsection*{riziko}
+Veličina, ktorá závisí od závažnosti/možného dopadu hrozby a pravdepodobnosti naplnenia hrozby.
+
+\subsection*{správa rizík}
+Proces identifikácie, odhadu,  vyhodnotenia rizík a prójmania opatrení voči nim. Patrí sem tiež monitorovanie zostatkových rizík a
+pravideln=e prehodnocovanie rizík.
+
+\subsection*{analýza rizík}
+Proces, ktorý identifikuje, posudzuje, hodnotí a ošetruje riziko.
+
+\subsection*{bezpečnostné opatrenie}
+Technické, organizačné, právne alebo iné riešenie, ktoré úplne alebo čiastočne odstraňuje zraniteľnosť, znižuje pravdepodobnosť naplnenia hrozby alebo
+v prípade naplnenia hrozby znižuje jej dopad.
+
+\subsection*{dôvernosť, confidentiality}
+Bezpečnostná požiadavka, ktorej naplnenie znamená, že prístup k informácií obsiahnutej v správe majú iba povolené osoby.
+
+\subsection*{integrita, integrity}
+Bezpečnostná požiadavka, ktorej naplnenie znamená, že údaje nie je nemôže zmeniť bez toho, aby to ich vlastník alebo adresát nemohol zistiť.
+
+\subsection*{dostupnosť, availability}
+Bezpečnostná požiadavka, ktorej naplnenie znamená, že zdroje systému sú k dispozícií oprávnenej osobe vždy alebo od času t, keď o to požiada.
+
+\subsection*{CIA}
+Anglická skratka iniciálok trojice bezpečnostných požiadaviek --- C(onfidentiality), I(ntegrity), A(vailability).
+
+\section{Organizácie a štandardy venujúce sa analýze rizík}
+
+Pri návrhu a vývoji nášho systému budeme vychádzať z medzinárodných štandardov a metodík. Dôvodom je záruka kvalitných podkladov a vedomostí expertov,
+ktorý majú mnohé praktické skúsenosti z problematikou KIB a súčasne kompatibilita ich riešení s legislatívnymi požiadavkami.
+
+\subsection*{NIST}
+
+NIST alebo \textit{angl.} \enquote{National Institute of Standards and Technology} je organizácia Spojených štátov amerických, ktorej cieľom je podpora inovácií
+a priemyselnej schopnosti pokrokmi v oblasti vedeckých meraní, štandardov a technológií spôsobmi, ktoré obohacujú ekonomickú bezpečnosť a kvalitu
+našich\footnote{Naších v zmysle občanov Spojených štátov amerických} životov\cite{nist_about}. NIST vypracoval viacero štandardov v oblasti správy rizík,
+napríklad \textit{NIST Special Publication 800-37}\cite{nist_sp_800_37} a \textit{NIST Special Publication 800-30}\cite{nist_sp_800_30}.
+
+\textbf{NIST Special Publication 800-37} \textit{Risk Management Framework for Information Systems and Organizations} poskytuje usmernenie pre implementáciu
+štruktúrovaného a znovupoužiteľný proces riadenia rizík. Začleňuje prvky bezpečnosti, súkromnosti a riadenia rizík dodávateľského reťazca. Implementácia pozostáva
+zo siedmych krokov:
+
+\begin{enumerate}
+    \item \textbf{príprava} esenciálnych aktivít potrebných pre riadenie bezpečnosť a ochranu súkromia v organizácií --- vymedzenie rolí a zodpovedností,
+    identifikácia tolerancie k risku a bezpečnostných požiadaviek a ďalšie
+    \item \textbf{kategorizácia} systémov a spracovávanej, uchovávanej a prenášanej informácie voči požiadavkám CIA
+    \item \textbf{voľba} bezpečnostných opatrení zo štandardu NIST SP 800-53\cite{nist_sp_800_53} na ochranu systému vychádzajúce z posúdení rizík
+    \item \textbf{implementácia} bezpečnostných opatrení a dokumentácia ich nasadenia
+    \item \textbf{posúdenie} súladu zavedených bezpečnostných opatrení, či sú funkčné a prinášajú požadované výsledky
+    \item \textbf{autorizácia} bezpečnostných opatrení vedením organizácie a určenie, či úroveň rizika systém je akceptovateľná
+    \item \textbf{monitorovanie} bezpečnostných opatrení pomocou logov, skenovania zraniteľností, hodnotenia bezpečnostných opatrení a prispôsobovanie
+    sa novým hrozbám
+\end{enumerate}
+
+\textbf{NIST Special Publication 800-30} \textit{Guide for Conducting Risk Assessments} poskytuje návod, ktorý ma pomôcť organizáciám identifikovať a
+posúdiť bezpečnostné riziko ich systémov a dát za použitia stratégie \textit{risk-based decision-making}\footnote{Myšlienkou \textit{risk-based decision-making}
+je vyhodnocovať riziká, príležitosti, potenciálne výsledky a voľba cesty k dlhodobému úspechu.}. Implementácia pozostáva zo štyroch krokov:
+\begin{enumerate}
+    \item \textbf{príprava}, definovanie účelu, rozsahu, predpokladov a zhromaždenie dát pre analýzu rizík
+    \item \textbf{vykonanie} analýzy rizík, a to identifikáciou zdrojov hrozieb, zraniteľností a určením pravdepodobnosti a dopadu
+    \item \textbf{komunikácia} zistení analýzy rizík zainteresovaným stranám, vedúcim a IT oddeleniam
+    \item \textbf{udržiavanie} analýzy rizík, aktualizácia a revidovanie v pravidelných intervaloch
+\end{enumerate}
+V príručke je každý z týchto krokov ešte rozdelený na podúlohy a obsahuje zoznam kľúčových aktivít pre daný krok.
+
+\subsection*{ISO/IEC 27000}
+ISO \textit{angl.} \enquote{International Organization for Standardization} je medzinárodne uznávaná organizácia publikujúca svetové štandardy, v oblasti
+kybernetickej a informačnej bezpečnosti je pre nás zaujímavá séria ISO/IEC 27000\cite{iso_27000}. Na základe tejto série sa môže organizácia certifikovať
+ISO 27001 certifikáciou. Mnohé ďalšie štandardy a príručky sa odkazujú na túto sériu a ich kompatibilitu s jej štandardami. Nás z tejto série bude zaujímať
+najmä štandard ISO/IEC 27005\cite{iso_27005} zameraný na riadenie rizík informačnej bezpečnosti.
+
+Štandard \textbf{ISO/IEC 27005} poskytuje štrukturovaný prístup k identifikácií, posudzovaniu a ošetrení rizík kybernetickej a informačnej bezpečnosti.
+Implementácia pozostáva z piatich krokov:
+\begin{enumerate}
+    \item \textbf{určenie kontextu}, definovanie rozsahu, cieľa, kritérií rizika, aktív, zainteresovaných strán, biznisových procesov a určenie akceptovateľného rizika
+    \item \textbf{posudzovanie rizika}, identifikácia (hrozieb, zraniteľností a potenciálnych dopadov), analýza (určenie pravdepodobnosti a dopadu každého rizika)
+    a vyhodnotenie (porovnanie voči akceptovateľnému riziku) rizík 
+    \item \textbf{ošetrenie rizík}, prijatie bezpečnostných opatrení na zmiernenie, prenos, akceptovanie alebo prenesenie rizika
+    \item \textbf{komunikácia rizík}, zistení analýzy rizík zainteresovaným stranám, vedúcim a IT oddeleniam a zaručenie súladu s biznisovými cieľmi organizácie
+    \item \textbf{monitorovanie a kontrola}, kontinuálne monitorovanie a aktualizácia rizík, vykonanie bezpečnostného auditu a penetračného testovania
+\end{enumerate}
+
+\subsection*{BSI}
+BSI \textit{nem.} \enquote{Bundesamt für Sicherheit in der Informationstechnik} je nemecký spolkový úrad pre informačnú bezpečnosť. BSI vydalo niekoľko štandardov
+v oblasti kybernetickej a informačnej bezpečnosti, konkrétne BSI-Standard 200-3\cite{bsi_200_3} a IT-Grundschutz-Compendium\cite{bsi_it_grundchutz_compendium}.
+Dôležité je tiež spomenúť, źe tieto štandardy sú kompatibilné so sériou ISO/IEC 27000.
+
+\textbf{IT-Grundschutz-Compendium} poskytuje štandardizované požiadavky pre typické biznisové procesy (napr. OPS.1.1.3 Patch and Change Management),
+aplikácie (napr. APP.1.1 Office Products), IT systémy (napr. SYS.1.3 Linux and Unix Servers ), komunikačné linky (napr. NET.1.1 Network Architecture and Design)
+a miestnosti (napr. INF.2 Data Centre and Server Room) popísané v samostatných moduloch IT-Grundschutz.
+
+Hádam najväčiou výhodou IT-Grundschutz-Compendium je zníženie analytického úsilia na organizácie. BSI pre jednotlivé moduly už vykonala  analýzu rizík,
+hrozieb a zraniteľností a vybralo vhodné bezpečnotné požiadavky pre typické scenáre, ktoré si môže organizácia prebrať a implementovať do vlastných 
+bezpečnostných opatrení v závislosti od ich vlastnej situácie, potrieb a zdrojov.
+
+\textbf{BSI-Standard 200-3} \textit{Risk Analysis based on IT Grundschutz} poskytuje jednoducho aplikovateľné a rozoznateľné procedúry, ktoré organizaciám
+umožňujú adekvátnu cielenú kontrolu rizík kybernetickej a informačnej bezpečnosti. Je to praktický návod pre analýzu rizík založený na IT-Grundschutz-Compendium
+opisujúci postupnosť krokov s príkladmi a vysvetleniami. Implementácia pozostáva zo štyroch krokov:
+\begin{enumerate}
+    \item \textbf{vypracovanie prehľadu hrozieb}, zostavenie zoznamu potenciálnych základných hrozieb, určenie dodatočných hrozieb vyplývajúcich zo
+    špecifických operačných scenárov
+    \item \textbf{klasifikácia rizík}, posudzovanie (určenie pravdepodobnosti a rozsahu škôd) a hodnotenie (určenie kategórie) rizík
+    \item \textbf{ošetrenie rizík}, vyhnutie sa riziku, zníženie rizika (určenie bezpečnostných opatrení), prenos rizika a akceptovanie rizika
+    \item \textbf{konsolidácia bezpečnostného konceptu}, integrovanie dodatočných bezpečnostných opatrení vyplývajúcich z analýzy rizík v bezpečnostnom koncepte
+\end{enumerate}
+
+\section{Výber štandardov pre náš systém}
+
+Jednou z výhod štandardov NIST je ich rozsiahlosť a obsažnosť, na druhú stranu ich cieľom sú veľké podniky na pôde Spojených štátov amerických. Nevylučujeme však,
+že pre manažéra kybernetickej a informačnej bezpečnosti by boli cenným zdrojom znalostí.
+
+Podobne, séria štandardov ISO/IEC 27000 rozsiahle opisuje požiadavky a spôsob vykonania analýzy rizík. Negatívum je, že nevysvetľujú postup tak \enquote{ľudsky},
+ako štandardy BSI, nie sú verejne dostupné a ani nie sú cenovo najdostupnejšie.
+
+Nakoniec sme sa rozhodli postupovať a vychádzať podľa štandardov BSI. Pre návrh a implementáciu nášho systému sme sa rozhodli vychádzať zo štandardu
+BSI-Standard 200-3\cite{bsi_200_3} a kompendia IT-Grundschutz-Compendium\cite{bsi_it_grundchutz_compendium}. Medzi ich hlavné výhody považujeme:
+\begin{itemize}
+    \item praktické návody na zavedenie kybernetickej a informačnej bezpečnosti
+    \item vypracovanie analýzy rizík pre štandardné situácie
+    \item modulárny prístup
+    \item verejná dostupnosť
+    \item dobre aplikovateľné v priestore Európskej únie a Slovenskej republiky
+    \item dajú sa dobre prispôsobiť rôzne veľkým/komplexným organizáciám
+    \item kompatibilita so série štandardami ISO/IEC 27000
+\end{itemize}
+
+Legislatíva SR v oblasti KIB vychádzala zo série štandardov ISO/IEC 27000, teda aplikovaním postupov a bezpečnostných opatrení štandardov BSI by sme dosiahli
+súlad aj s našou legislatívou.
+
+
+\section{Požiadavky na systém}
+
+Náš systém bude postavený na štandarde BSI-Standard 200-3\cite{bsi_200_3} a moduloch kompendia IT-Grundschutz-Compendium\cite{bsi_it_grundchutz_compendium}.
+Používateľovi by mal pomôcť nasledovne:
+\begin{enumerate}
+    \item oboznámi ho o jeho zákonných povinnostiach
+    \item poskytne mu zoznam aktív pre analýzu rizík, z ktorých si zvolí relevantné aktíva
+    \item prevedie ho postupom analýzy rizík pre konkrétne aktívum
+    \item navrhne mu bezpečnostné opatrenia na ošetrenie rizík
+    \item vytvorí bezpečnostnú dokumentáciu vykonanej analýzy rizík
+\end{enumerate}
+
+Systém bude navrhnutý modulárne, aby poskytoval jednotný prístup pri analýze rizík a aby mohol byť v budúcnosti ľahko rozšíriteľný.
+Cieľová skupina nášho systému sú malé samosprávy, ktoré nemajú dostatočné prostriedky alebo kapacity, aby si analýzu rizík sieti a informačných systémov
+urobili sami.
+
+Naskytá sa otázka, ako navrhnúť takýto systém, aby bol použiteľný, modulárny a intuitívny pre používateľa? Touto otázkou sa budeme zaoberať v ďalších kapitolách.
