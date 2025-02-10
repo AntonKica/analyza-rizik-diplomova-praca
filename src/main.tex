@@ -30,9 +30,9 @@
     \renewcommand{\tableofcontents}{}
     \renewcommand{\footnote}{}
     \makeatletter
-    \renewcommand{\th@plain}{\thm@preskip 0pt\relax\thm@postskip 0pt\relax}
-    \renewcommand{\th@definition}{\thm@preskip 0pt\relax\thm@postskip 0pt\relax}
-    \renewcommand{\th@remark}{\thm@preskip 0pt\relax\thm@postskip 0pt\relax}
+    \renewcommand{\th@plain}{\thm@preskip0pt\relax\thm@postskip0pt\relax}
+    \renewcommand{\th@definition}{\thm@preskip0pt\relax\thm@postskip0pt\relax}
+    \renewcommand{\th@remark}{\thm@preskip0pt\relax\thm@postskipgpt\relax}
     \makeatother
     \usepackage{enumitem}
     \setlist[enumerate]{topsep=0pt,itemsep=0pt,partopsep=0pt,parsep=0pt}
@@ -141,7 +141,7 @@
 \thispagestyle{empty}
 
 \noindent
-\includegraphics[trim=2.5cm 5cm 2.5cm 0,width=\textwidth]{images/assignment-sk.pdf}
+\includepdf[pages={1-}]{images/assignment-sk.pdf}
 
 \ifenglish{}
     \newpage
